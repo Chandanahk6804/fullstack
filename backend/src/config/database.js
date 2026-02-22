@@ -52,6 +52,7 @@ const executeTransaction = async (callback) => {
         return result
     }
     catch(error) {
+        console.log("Transaction error: "+ error)
         await connection.rollback()
 
         if (error.code === "ER_DUP_ENTRY") {
@@ -60,7 +61,7 @@ const executeTransaction = async (callback) => {
 
         throw new AppError(
             500,
-            "Database transaction failed",
+            error,
             "DATABASE_TRANSCATION_ERROR"
         )
     }

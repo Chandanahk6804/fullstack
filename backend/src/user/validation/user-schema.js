@@ -8,10 +8,15 @@ const userSchema = joi.object({
 })
 
 const signupSchema = userSchema.fork(
-    ["userName", "emai", "roleId", "password"], 
+    ["userName", "email", "password"], 
+    (field) => field.required()
+)
+
+const loginSchema = userSchema.fork(
+    ["email", "password"],
     (field) => field.required()
 )
 
 const updateUserSchema = userSchema.min(1)
 
-module.exports = {signupSchema, updateUserSchema}
+module.exports = {signupSchema, loginSchema, updateUserSchema}

@@ -1,10 +1,11 @@
 const {AppError} = require('../utils/custom-error')
 
 const errorHandler = (err, req, res, next) => {
+    const statusCode = err.statusCode || 500
     console.log(err)
 
     if (err instanceof AppError) {
-        return res.staus(err.staus).json({
+        return res.status(statusCode).json({
             success: false,
             errorCode: err.errorCode,
             message: err.message
