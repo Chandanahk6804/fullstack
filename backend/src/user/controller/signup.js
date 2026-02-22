@@ -34,7 +34,7 @@ const signup = async (req, res, next) => {
         })
 
         return responseHandler(res, {
-            statusCode: 200,
+            statusCode: 201,
             message: "User signup successful",
             data: result
         })

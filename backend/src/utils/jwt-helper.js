@@ -1,5 +1,6 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const { AppError, UnauthorizedError } = require('./custom-error')
 
 const generateToken =  (userId, email) => {
     const payload = {
@@ -7,13 +8,31 @@ const generateToken =  (userId, email) => {
         email: email
     }
 
-    const token = jwt.sign (
-        payload,
-        process.env.JWT_SECRET
-    )
+    try {
+        const token = jwt.sign (
+            payload,
+            process.env.JWT_SECRET
+        )
 
-    return token
+        return token
+    }
+    catch(error) {
+        console.log("JWT error "+ error)
+        throw new AppError(
+            500,
+            "Failed to generate token",
+            "JWTGenerationError"
+        )
+    }
 }
 
-
-module.exports = {generateToken}
+const verifyToken = (token) => {
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET)
+    }
+    catch(error) {
+        console.log("JWT error "+ error)
+        throw new UnauthorizedError("Invalid or Expired token")
+    }
+}
+module.exports = {generateToken, verifyToken}

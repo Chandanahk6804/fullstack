@@ -3,7 +3,7 @@ const { executeQuery } = require("../../config/database")
 const {generateToken} = require('../../utils/jwt-helper')
 const { verifyPassword } = require("../../utils/bcrypt-helper")
 
-const { UnauthorizedError, NotFoundError, AppError } = require("../../utils/custom-error")
+const { UnauthorizedError, AppError } = require("../../utils/custom-error")
 
 const responseHandler = require("../../utils/response-handler")
 
@@ -17,14 +17,16 @@ const getPasswordQuery = `
 
 const login = async (req, res) => {
     const {email, password} = req.body
+
     const [user] = await executeQuery(getPasswordQuery, {email})
-    const hashedPassword = user.password_hash
-    const userId = user.user_id
 
     if(!user) {
-        throw new NotFoundError("User not found")
+        throw new UnauthorizedError("Invalid credentials")
     }
 
+    const hashedPassword = user.password_hash
+    const userId = user.user_id
+    
     const isMatch = await verifyPassword(password, hashedPassword)
 
     if(!isMatch) {
@@ -32,14 +34,6 @@ const login = async (req, res) => {
     }
 
     const token = generateToken(userId, email)
-
-    if(!token) {
-        throw new AppError(
-            500,
-            "Failed to generate token",
-            "JWTGenerationError"
-        )
-    }
 
     return responseHandler(res, {
         statusCode: 200,
